@@ -1,23 +1,65 @@
-import {View, Text, StyleSheet, TouchableOpacity, FlatList} from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  FlatList,
+  Image,
+  Alert,
+} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {useIsFocused, useNavigation} from '@react-navigation/native';
-import {db, getCourses} from '../../db/Database';
+import {db, deleteCourse, getCourses} from '../../db/Database';
 
 const Courses = () => {
   const navigation = useNavigation();
   const [courses, setCourses] = useState([]);
   const isFocused = useIsFocused();
   useEffect(() => {
+    getCourseList();
+  }, [isFocused]);
+  const getCourseList = () => {
     getCourses(result => {
       console.log('response', result);
       setCourses(result);
     });
-  }, [isFocused]);
+  };
   const renderItem = ({item, index}) => {
     return (
       <View style={styles.courseItem}>
-        <Text style={styles.courseName}>{item.name}</Text>
-        <Text style={styles.fees}>{'INR ' + item.fees}</Text>
+        <View>
+          <Text style={styles.courseName}>{item.name}</Text>
+          <Text style={styles.fees}>{'INR ' + item.fees}</Text>
+        </View>
+        <View style={{gap: 20}}>
+          <TouchableOpacity
+            onPress={() => {
+              deleteCourse(
+                item.id,
+                res => {
+                  Alert.alert('res', JSON.stringify(res));
+                  getCourseList();
+                },
+                err => {
+                  Alert.alert('error', err);
+                },
+              );
+            }}>
+            <Image
+              source={require('../../images/delete.png')}
+              style={styles.icon}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              navigation.navigate('AddCourse', {type: 'edit', data: item});
+            }}>
+            <Image
+              source={require('../../images/edit.png')}
+              style={styles.icon}
+            />
+          </TouchableOpacity>
+        </View>
       </View>
     );
   };
@@ -27,7 +69,7 @@ const Courses = () => {
       <TouchableOpacity
         style={styles.addCourseBtn}
         onPress={() => {
-          navigation.navigate('AddCourse');
+          navigation.navigate('AddCourse', {type: 'new'});
         }}>
         <Text style={styles.btnTxt}>+ Add Course</Text>
       </TouchableOpacity>
@@ -55,9 +97,12 @@ const styles = StyleSheet.create({
     height: 100,
     borderRadius: 10,
     alignSelf: 'center',
-    justifyContent: 'center',
     alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     backgroundColor: '#f2f2f2',
+    paddingHorizontal: 20,
+
     marginTop: 20,
   },
   addCourseBtn: {
@@ -74,5 +119,9 @@ const styles = StyleSheet.create({
   btnTxt: {
     color: 'white',
     fontSize: 20,
+  },
+  icon: {
+    width: 24,
+    height: 24,
   },
 });
