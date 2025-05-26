@@ -73,6 +73,20 @@ const Courses = () => {
         }}>
         <Text style={styles.btnTxt}>+ Add Course</Text>
       </TouchableOpacity>
+      <TouchableOpacity
+        style={[styles.addCourseBtn, {bottom: 120}]}
+        onPress={() => {
+          navigation.navigate('AddSubject', {type: 'new'});
+        }}>
+        <Text style={styles.btnTxt}>+ Add Subject</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={[styles.addCourseBtn, {bottom: 180}]}
+        onPress={() => {
+          navigation.navigate('Subjects');
+        }}>
+        <Text style={styles.btnTxt}>View Subjects</Text>
+      </TouchableOpacity>
     </View>
   );
 };
